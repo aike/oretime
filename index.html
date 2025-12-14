@@ -3,60 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>At Station</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-      text-align: center;
-      background-color: #FFF7EA;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    #info {
-      margin-top: 20px;
-      font-size: 18px;
-    }
-    .error {
-      color: red;
-    }
-    #locationStatus {
-      display: none;
-    }
-    #stationInfo {
-      text-align: center;
-      font-size: 19px;
-      color: #332312;
-    }
-    #box {
-      width: 300px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #schedule {
-      text-align: left;
-      font-size: 22px;
-      margin: 0px;
-      padding-left: 40px;
-      color: #140B04;
-    }
-</style>
-</head>
-<body>
-  <div id="info">
-    <p id="locationStatus">位置情報を取得中…</p>
-    <p id="stationInfo"></p>
-    <div id="box"><div id="schedule"></div></div>
-  </div>
-  
-  <script>
+  <title>オレオレ時刻表</title>
+
+  <script type="text/javascript">
+
+    // ★★ 自分の利用駅に合わせて設定する。3か所より多くても少なくても良い ★★
+    // 駅名リスト
+    const st = ["幌平橋", "札幌", "野幌"];
+
+    // 駅の緯度経度リスト
+    const stationCoords = {};
+    stationCoords[st[0]] = { lat: 43.04040433914205, lon: 141.35574742753303};
+    stationCoords[st[1]] = { lat: 43.06878376429499, lon: 141.35076610764554 };
+    stationCoords[st[2]] = { lat: 43.09235380590427, lon: 141.5295765266777 };
+
+    // 駅の時刻表リスト
+    const timetables = {"AM": {}, "PM": {}};
+    // 駅０から駅１への時刻表 (午前)
+    timetables["AM"][st[0] + "_" + st[1]] = [
+      "06:11","06:21","06:31","06:41","06:49","06:56",
+      "07:03","07:09","07:15","07:20","07:24","07:28","07:32","07:36","07:41","07:45","07:49","07:53","07:58",
+      "08:02","08:06","08:10","08:14","08:18","08:22","08:26","08:30","08:34","08:39","08:43","08:47","08:51","08:56",
+      "09:00","09:04","09:08","09:12","09:16","09:20","09:25","09:32","09:38","09:45","09:53",
+      "10:00","10:08","10:14","10:21","10:29","10:36","10:43","10:50","10:57",
+      "11:04","11:11","11:18","11:25","11:32","11:39","11:46","11:53"
+    ];
+    // 駅１から駅２への時刻表 (午前)
+    timetables["AM"][st[1] + "_" + st[2]] = [
+      "06:00","06:16","06:35","06:57",
+      "07:15","07:22","07:33","07:44",
+      "08:02","08:18","08:35","08:43","08:52",
+      "09:10","09:23","09:46",
+      "10:07","10:26","10:45",
+      "11:06","11:23","11:45"
+    ];
+    
+    // 駅２から駅１への時刻表 (午後)
+    timetables["PM"][st[2] + "_" + st[1]] = [
+      "12:02","12:21","12:36",
+      "13:00","13:21","13:36","13:57",
+      "14:21","14:37",
+      "15:00","15:22","15:37","15:59",
+      "16:19","16:28","16:39","16:49","16:58",
+      "17:07","17:29","17:37","17:59",
+      "18:20","18:26","18:37","18:55",
+      "19:02","19:32","19:39","19:53",
+      "20:02","20:20","20:36","20:44","20:55",
+      "21:07","21:33","21:45","21:56",
+      "22:07","22:28","22:57",
+      "23:28"
+    ];
+    // 駅１から駅０への時刻表 (午後)
+    timetables["PM"][st[1] + "_" + st[0]] = [
+      "12:05","12:12","12:19","12:26","12:33","12:40","12:47","12:54",
+      "13:01","13:08","13:15","13:22","13:29","13:36","13:43","13:50","13:57",
+      "14:04","14:11","14:18","14:25","14:32","14:39","14:46","14:53",
+      "15:00","15:07","15:14","15:21","15:28","15:35","15:42","15:48","15:56",
+      "16:03","16:10","16:17","16:24","16:32","16:38","16:44","16:49","16:54",
+      "17:00","17:05","17:10","17:15","17:20","17:25","17:30","17:36","17:41","17:46","17:51","17:56",
+      "18:01","18:07","18:12","18:17","18:22","18:27","18:32","18:37","18:43","18:48","18:53","18:58",
+      "19:03","19:08","19:13","19:18","19:24","19:29","19:34","19:40","19:45","19:51","19:56",
+      "20:03","20:11","20:19","20:27","20:35","20:43","20:51","20:59",
+      "21:07","21:15","21:23","21:31","21:39","21:47","21:55",
+      "22:03","22:11","22:19","22:28","22:36","22:44","22:52",
+      "23:00","23:09","23:17","23:26","23:36","23:44","23:52",
+      "24:01","24:09"
+    ];
+    // ★★ ここまで設定項目 ★★
+
+
+    // テスト用関数 ///////////////////////////////////////////////////////////
     const test = false;
 
+    const test_time = new Date("2025-01-01T08:00:00");
+    const test_location =  stationCoords[st[1]];
+
     function testGetTimes(loc, tim, expected) {
-      actual = getUpcomingTimes(loc, new Date("2025-01-01T" + tim + ":00"));
+      let actual = getUpcomingTimes(loc, new Date("2025-01-01T" + tim + ":00"));
       if (JSON.stringify(actual) !== JSON.stringify(expected)) {
         console.log(`Test failed for "${loc}" at [${tim}] => expected [${expected}], actual [${actual}]`);
       } else {
@@ -65,61 +88,23 @@
     }
 
     function testCase() {
-      testGetTimes("ExampleStation1", "06:00", ["07:45", "08:00"]);
-      testGetTimes("ExampleStation1", "07:50", ["08:00", "08:15"]);
-      testGetTimes("ExampleStation1", "08:00", ["08:00", "08:15"]);
-      testGetTimes("ExampleStation1", "08:10", ["08:15", "08:30"]);
-      testGetTimes("ExampleStation1", "08:20", ["08:30"]);
-      testGetTimes("ExampleStation1", "08:40", []);
-      testGetTimes("ExampleStation1", "13:00", []);
-      testGetTimes("ExampleStation2", "08:10", ["08:20", "08:35"]);
-      testGetTimes("ExampleStation2", "17:20", ["17:30", "17:45"]);
-      testGetTimes("ExampleStation3", "08:15", ["08:25", "08:40"]);
-      testGetTimes("ExampleStation3", "17:20", ["17:25", "17:40"]);
-      testGetTimes("ExampleStation4", "17:10", ["17:20", "17:35"]);
-      testGetTimes("ExampleStation4", "08:00", []);
+      userPosition = test_location;
+      updateTimetable();
+
+      testGetTimes("幌平橋", "06:00", ["06:11", "06:21"]);
+      testGetTimes("幌平橋", "11:50", ["11:53"]);
+      testGetTimes("幌平橋", "11:55", []);
+      testGetTimes("札幌", "08:10", ["08:18","08:35"]);
+      testGetTimes("札幌", "11:30", ["11:45"]);
+      testGetTimes("札幌", "11:50", []);
+      testGetTimes("野幌", "18:00", ["18:20","18:26"]);
+      testGetTimes("野幌", "23:00", ["23:28"]);
+      testGetTimes("野幌", "23:30", []);
+      testGetTimes("札幌", "00:05", ["24:09"]);
+      testGetTimes("札幌", "00:10", []);
     }
 
-
-    // ★★ 自分の利用駅に合わせて設定する。4か所より多くても少なくても良い ★★
-    // 駅名リスト
-    const stationNames = [
-      "ExampleStation1",
-      "ExampleStation2",
-      "ExampleStation3",
-      "ExampleStation4"
-    ];
-
-    const s1 = stationNames[0];
-    const s2 = stationNames[1];
-    const s3 = stationNames[2];
-    const s4 = stationNames[3];
-    const s1_s2 = s1 + "_" + s2;
-    const s2_s3 = s2 + "_" + s3;
-    const s3_s4 = s3 + "_" + s4;
-    const s4_s3 = s4 + "_" + s3;
-    const s3_s2 = s3 + "_" + s2;
-    const s2_s1 = s2 + "_" + s1;
-
-    // 駅の緯度経度リスト
-    const stationCoords = {};
-    stationCoords[s1] = { lat: 35.0000, lon: 139.0000 };
-    stationCoords[s2] = { lat: 35.0010, lon: 139.0010 };
-    stationCoords[s3] = { lat: 35.0020, lon: 139.0020 };
-    stationCoords[s4] = { lat: 35.0030, lon: 139.0030 };
-
-    // 駅の時刻表リスト
-    const timetables = {"AM": {}, "PM": {}};
-    timetables["AM"][s1_s2] = ["07:45", "08:00", "08:15", "08:30"];
-    timetables["AM"][s2_s3] = ["08:05", "08:20", "08:35", "08:50"];
-    timetables["AM"][s3_s4] = ["08:10", "08:25", "08:40", "08:55"];
-    timetables["PM"][s4_s3] = ["17:05", "17:20", "17:35", "17:50"];
-    timetables["PM"][s3_s2] = ["17:10", "17:25", "17:40", "17:55"];
-    timetables["PM"][s2_s1] = ["17:15", "17:30", "17:45", "18:00"];
-    // ★★ ここまで設定項目 ★★
-
-    let userPosition = null;
-
+    ///////////////////////////////////
     function haversineDistance(a, b) {
       const R = 6371e3;
       const toRad = x => x * Math.PI / 180;
@@ -148,7 +133,7 @@
 
     function getNearestStation(pos) {
       let nearest = null, minD = Infinity;
-      for (const name of stationNames) {
+      for (const name of st) {
         const d = haversineDistance(pos, stationCoords[name]);
         if (d < minD) { minD = d; nearest = name; }
       }
@@ -156,17 +141,21 @@
     }
 
     function getTimePeriod(date = new Date()) {
-      return date.getHours() < 12 ? 'AM' : 'PM';
+      let hour = date.getHours();
+      if (hour === 0) {
+        hour = 24;
+      }
+      return hour < 12 ? 'AM' : 'PM';
     }
 
     function getRouteKey(station, period) {
-      const idx = stationNames.indexOf(station);
+      const idx = st.indexOf(station);
       if (idx === -1) return null;
-      if (period === 'AM' && idx < stationNames.length - 1) {
-        return `${station}_${stationNames[idx+1]}`;
+      if (period === 'AM' && idx < st.length - 1) {
+        return `${station}_${st[idx+1]}`;
       }
       if (period === 'PM' && idx > 0) {
-        return `${station}_${stationNames[idx-1]}`;
+        return `${station}_${st[idx-1]}`;
       }
       return null;
     }
@@ -178,16 +167,18 @@
       if (!routeKey || !timetables[period][routeKey]) {
         return [];
       }
+      const hour = now.getHours() === 0 ? 24 : now.getHours();
+      const nowtime = hour * 60 + now.getMinutes();
       const ret = timetables[period][routeKey].filter(timeStr => {
         const [h, m] = timeStr.split(':').map(Number);
-        let dep = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m);
-        return dep >= now;
+        const ttime = parseInt(h === "24" ? "0" : h) * 60 + parseInt(m);
+        return ttime >= nowtime;
       });
       return ret.slice(0, 2);
     }
 
     function getMinutesUntil(timeStr) {
-      const now = new Date();
+      const now = (test) ? test_time : new Date();
       const [h, m] = timeStr.split(':').map(Number);
       let dep = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m);
       if (dep < now) dep.setDate(dep.getDate() + 1);
@@ -198,46 +189,234 @@
       if (!userPosition) return;
 
       const nearest = getNearestStation(userPosition);
-      const period  = getTimePeriod();
+      const now = (test) ? test_time : new Date();
+      const period  = getTimePeriod(now);
       const routeKey = getRouteKey(nearest, period);
 
-      const infoEl = document.getElementById('stationInfo');
-      const schEl  = document.getElementById('schedule');
+      const infoElm = document.getElementById('stationInfo');
+      const schElm1  = document.getElementById('time1');
+      const schElm2  = document.getElementById('time2');
+      const cdElm1  = document.getElementById('countdown1');
+      const cdElm2  = document.getElementById('countdown2');
 
       if (!routeKey || !timetables[period][routeKey]) {
-        infoEl.textContent = `目的地が最寄りのため乗車不要です`;
-        schEl.textContent  = '';
+        infoElm.textContent = `目的地が最寄りのため乗車不要です`;
+        schElm1.textContent  = '';
+        schElm2.textContent  = '';
+        cdElm1.textContent  = '';
+        cdElm2.textContent  = '';
         return;
       }
 
       // 切り出した関数を使って直近出発リストを取得
-      const upcoming = getUpcomingTimes(nearest, new Date());
+      const upcoming = (test) ? getUpcomingTimes(nearest, test_time) : getUpcomingTimes(nearest, new Date());
 
       // 駅情報表示
       const [from, to] = routeKey.split('_');
-      infoEl.textContent = `${nearest} → ${to}`;
+      infoElm.textContent = `${nearest} → ${to}`;
 
       // 時刻表示
       if (upcoming.length === 0) {
-        schEl.textContent = '本日の運行は終了しました';
+        schElm1.textContent = '本日の運行は終了しました';
+        schElm1.textContent  = '';
+        schElm2.textContent  = '';
+        cdElm1.textContent  = '';
+        cdElm2.textContent  = '';
       } else {
-        let html = `先発 ${upcoming[0]} （あと${getMinutesUntil(upcoming[0])}分）`;
+        schElm1.textContent  = upcoming[0];
+        cdElm1.textContent  = `あと ${getMinutesUntil(upcoming[0])}分`;
         if (upcoming[1]) {
-          html += `<br>次発 ${upcoming[1]} （あと${getMinutesUntil(upcoming[1])}分）`;
+          schElm2.textContent  = upcoming[1];
+          cdElm2.textContent  = `あと ${getMinutesUntil(upcoming[1])}分`;
+        } else {
+          schElm2.textContent  = '';
+          cdElm2.textContent  = '';
         }
-        schEl.innerHTML = html;
       }
     }
 
-    setInterval(() => {
-      if (userPosition) updateTimetable();
-    }, 60000);
+    let userPosition = null;
+    window.onload = () => {
+      if (test) {
+        testCase();
+        return;
+      }
 
-    if (test) {
-      window.onload = testCase;
-    } else {
-      window.onload = getLocation;
-    }
+      getLocation(); 
+      setInterval(() => {
+        if (userPosition) updateTimetable();
+      }, 60000);
+    };
+
   </script>
+
+  <style>
+
+    :root {
+        --bg-color: #080816;
+        --bg-header: #1b2034;
+        --bg-first: #1c2035;
+        --bg-secondary: #27204d;
+        --text-1-time: #eefb34;
+        --text-1-label: #2cfdf2;
+        --text-1-rest: #f0628a;
+
+        --text-2-time: #2cfdf2;
+        --text-2-label: #2cfdf2;
+        --text-2-rest: #2cfdf2;
+
+        --text-header: #fafaf9;
+        --accent-color: #F472B6;
+    }
+
+    /* --- 2. リセット & ベーススタイル --- */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden; /* スクロールさせない */
+    }
+
+    /* --- 3. メインレイアウト (Flexbox) --- */
+    .app-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* ヘッダー: 路線情報など */
+    .header-area {
+        height: 12vw;
+        display: flex;
+        background-color: var(--bg-header);
+        align-items: center;
+        justify-content: center;
+        font-size: 5vw;
+        color: var(--text-header);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* 先発エリア (画面の残りスペースの60-70%を占める) */
+    .first-departure {
+        width: 96%;
+        margin: 16px auto 0px auto;
+        flex: 2; /* 比率を大きく */
+        background-color: var(--bg-first);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        border-radius: 20px;
+    }
+
+    /* 次発エリア (画面の残りスペースの30-40%を占める) */
+    .next-departure {
+        flex: 1;
+        width: 96%;
+        margin: 16px auto 0px auto;
+        background-color: var(--bg-secondary);
+        display: flex;
+        flex-direction: column;
+/*        justify-content: center; */
+        align-items: center;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        padding-top: 8vw;
+    }
+
+    /* --- 4. タイポグラフィ --- */
+    
+    /* ラベル (先発 / 次発) */
+    .label1 {
+        margin: 0 auto 0 10%;
+        font-size: 6vw;
+        font-weight: 600;
+        color: var(--text-1-label);
+    }
+
+    .label2 {
+        margin: 0 auto 0 10%;
+        font-size: 4vw;
+        font-weight: 600;
+        color: var(--text-2-label);
+    }
+
+    /* 先発の時刻: 巨大に */
+    .time-large {
+        font-size: 32vw; /* 画面幅に応じた巨大サイズ */
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-1-time);
+        font-variant-numeric: tabular-nums; /* 数字の幅を揃える */
+    }
+
+    /* 次発の時刻: 中サイズ */
+    .time-medium {
+        font-size: 25vw; /* 画面幅に応じた巨大サイズ */
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-2-time);
+        font-variant-numeric: tabular-nums; /* 数字の幅を揃える */
+    }
+
+    /* カウントダウン: 中サイズ */
+    .countdown1 {
+        margin: 2vw auto 0 10%;
+        font-size: 9vw;
+        font-weight: 600;
+        color: var(--text-1-rest);
+    }
+
+    .countdown2 {
+        margin: 1vw auto 0 20%;
+        font-size: 5vw;
+        font-weight: 600;
+        color: var(--text-2-rest);
+    }
+
+    #locationStatus {
+      display: none;
+    }
+
+    </style>
+</head>
+
+<body>
+  <!--div id="info">
+    <p id="locationStatus">位置情報を取得中…</p>
+    <p id="stationInfo"></p>
+    <div id="box"><div id="schedule"></div></div>
+  </div-->
+  
+  <div class="app-container">
+   
+    <header class="header-area" id="stationInfo"></header>
+
+    <p id="locationStatus">位置情報を取得中…</p>
+
+    <main class="first-departure">
+        <div class="label1">先発</div>
+        <div class="time-large" id="time1"></div>
+        <div class="countdown1" id="countdown1"></div>
+    </main>
+
+    <footer class="next-departure">
+        <div class="label2">次発</div>
+        <div class="time-medium" id="time2"></div>
+        <div class="countdown2" id="countdown2"></div>
+    </footer>
+
+  </div>
+
+
 </body>
 </html>

@@ -1,30 +1,29 @@
-# atstation
+# oretime
 
-atstation is a lightweight, client-side web app that shows the next train departure based on your current location and time of day. It uses the HTML5 Geolocation API to detect your nearest station and then selects the appropriate schedule for AM (outbound) or PM (return) trips. Customize the station list and timetable data to match your own train lines.
+oretimeは、現在地と時刻に基づいて次の列車の出発時刻を表示する、軽量なクライアントサイドウェブアプリです。HTML5 Geolocation APIを使用して最寄り駅を検出し、午前（往路）または午後（復路）の適切な時刻表を選択します。駅リストと時刻表データを、ご自身の路線に合わせてカスタマイズできます
 
 <img src="ss.png" width="245px" />
 
 ## Quick Start
-1. Download or clone the repository and open `index.html` in your browser.  
-2. Allow location access when prompted to enable nearest-station detection.  
-3. View live countdowns to your next departure.
+1. リポジトリをダウンロードまたはクローンして、index.htmlブラウザで開きます
+2. 最寄り駅の検出を有効にするには、プロンプトが表示されたら位置情報へのアクセスを許可します。
+3. 次の出発までのライブカウントダウンを表示します。
 
 ## Configuration
-At the top of the `<script>` in `index.html`, update the following to suit your trains:
-- **stationNames**: an ordered array of your station IDs (e.g., `["A","B","C"]`).  
-- **stationCoords**: map each ID to its `{ lat, lon }` coordinates.  
-- **timetables**: define `AM`/`PM` schedules with keys like `"s1_s2"` and arrays of `"HH:MM"` strings.
+index.htmlの上部にある以下の項目を、列車に合わせて更新してください
+- **st**: 駅名の順序付き配列
+- **stationCoords**: 各駅の緯度経度
+- **timetables**: 各駅の午前・午後の時刻表
 
-Only these three sections need editing—no other code changes required.
+編集する必要があるのはこれら 3 つのセクションのみで、他のコードの変更は必要ありません。
 
 ## Features
-- **Geolocation-based**: Automatically finds your nearest station via the Geolocation API.  
-- **Time-of-day routing**: Uses forward routes before noon, return routes after.  
-- **Next two departures**: Shows minutes until the next two trains.  
-- **Auto-refresh**: Updates every minute to keep countdowns accurate.  
+- 最寄り駅検出：位置情報APIにより最寄りの駅を自動的に判断します
+- 移動方向検出: 午前は順方向ルートを使用し、午後は戻りルートを使用します
+- 自動更新: 直近の発車時刻は1分ごとに現在時刻と比較して更新されます。
 
-Note: The geolocation is not automatically updated; you must reload the page to get a new location.
+注: 地理位置情報は自動的に更新されないため、新しい位置情報を取得するにはページを再読み込みする必要があります。
 
 ## Credit
-atstation program is licensed under MIT License.  
+oretime program is licensed under MIT License.  
 Contact: X @aike1000
