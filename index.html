@@ -88,9 +88,11 @@
     }
 
     function testCase() {
+      // test_location、test_timeの場合の表示テスト
       userPosition = test_location;
       updateTimetable();
 
+      // 各駅・各時間帯での時刻取得テスト
       testGetTimes("幌平橋", "06:00", ["06:11", "06:21"]);
       testGetTimes("幌平橋", "11:50", ["11:53"]);
       testGetTimes("幌平橋", "11:55", []);
@@ -217,7 +219,6 @@
 
       // 時刻表示
       if (upcoming.length === 0) {
-        schElm1.textContent = '本日の運行は終了しました';
         schElm1.textContent  = '';
         schElm2.textContent  = '';
         cdElm1.textContent  = '';
